@@ -3,10 +3,6 @@ module Markable
     belongs_to :markable, :polymorphic => true
     belongs_to :marker, :polymorphic => true
 
-    if Rails.version.to_i < 4  
-      attr_accessible :markable_id, :markable_type, :marker_id, :marker_type, :mark
-    end
-
     # Delete orphan marks
     #
     # Marks are deleted when marker or markable record is destroyed. However, in some circumstances, some marks
@@ -17,7 +13,7 @@ module Markable
     #
     # @return [Number] Deleted orphan marks count
     def self.delete_orphans
-      Markable::Mark.all.delete_if { |mark|
+      Markable::Mark.all.to_a.delete_if { |mark|
         mark.marker && mark.markable
       }.each { |orphan|
         Markable::Mark.delete_all orphan.attributes

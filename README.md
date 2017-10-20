@@ -18,7 +18,7 @@ Nope, **markable** can handle it too!
 
 
 
-##Installation
+## Installation
 
 Add to your Gemfile
 
@@ -34,7 +34,7 @@ rails generate markable:migration
 rake db:migrate
 ```
 
-##Upgrade
+## Upgrade
 
 If you are upgrading from version 0.1.0 or less, run
 ```
@@ -191,9 +191,19 @@ food.marked_as_favorite?
 food.marked_as_favorite? :by => user1
 ```
 
-##Usage examples
+## Usage examples
 
 You can find some usage examples at wiki page: [Usage examples](https://github.com/chrome/markable/wiki/Usage-examples)
+
+## Testing
+create db:
+```
+( cd test/dummy && rake db:setup RAILS_ENV=test )
+```
+run tests:
+```
+rake test
+```
 
 ## License
 

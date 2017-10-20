@@ -1,4 +1,5 @@
 require 'rake'
+require 'active_record'
 require 'models/mark'
 load 'tasks/markable.rake'
 
@@ -35,34 +36,49 @@ protected
         markable.__markable_marks.each do |mark, options|
           if options[:allowed_markers] == :all || options[:allowed_markers].include?(marker.marker_name)
             markable_name = markable.name.downcase
-            method_name = "#{mark}_#{markable_name}".pluralize
-            marker.class_eval %(
-              def #{method_name}
-                #{markable.name}.marked_as :#{mark}, :by => self
-              end
-              def #{markable_name.pluralize}_marked_as mark
-                #{markable.name}.marked_as mark, :by => self
-              end
-              def #{markable_name.pluralize}_marked_as_#{mark}
-                #{markable.name}.marked_as :#{mark}, :by => self
-              end
-            )
-            unless marker.methods.include?("mark_as_#{mark}".to_sym)
+
+            unless marker.method_defined? "#{markable_name.pluralize}_marked_as"
+              marker.class_eval %(
+                def #{markable_name.pluralize}_marked_as mark
+                  #{markable.name}.marked_as mark, :by => self
+                end
+              )
+            end
+
+            unless marker.method_defined? "#{"#{mark}_#{markable_name}".pluralize}"
+              marker.class_eval %(
+                def #{"#{mark}_#{markable_name}".pluralize}
+                  #{markable.name}.marked_as :#{mark}, :by => self
+                end
+                def #{markable_name.pluralize}_marked_as_#{mark}
+                  #{markable.name}.marked_as :#{mark}, :by => self
+                end
+              )
+            end
+
+            unless marker.method_defined? "mark_as_#{mark}"
               marker.class_eval %(
                 def mark_as_#{mark}(objects)
                   self.set_mark :#{mark}, objects
                 end
               )
             end
-            markable.class_eval %(
-              def #{marker.marker_name.to_s.pluralize}_have_marked_as mark
-                self.have_marked_as_by(mark, #{marker.name})
-              end
 
-              def #{marker.marker_name.to_s.pluralize}_have_marked_as_#{mark}
-                self.have_marked_as_by(:#{mark}, #{marker.name})
-              end
-            )
+            unless markable.method_defined? "#{marker.marker_name.to_s.pluralize}_have_marked_as"
+              markable.class_eval %(
+                def #{marker.marker_name.to_s.pluralize}_have_marked_as mark
+                  self.have_marked_as_by(mark, #{marker.name})
+                end
+              )
+            end
+
+            unless markable.method_defined? "#{marker.marker_name.to_s.pluralize}_have_marked_as_#{mark}"
+              markable.class_eval %(
+                def #{marker.marker_name.to_s.pluralize}_have_marked_as_#{mark}
+                  self.have_marked_as_by(:#{mark}, #{marker.name})
+                end
+              )
+            end
           end
         end
       end

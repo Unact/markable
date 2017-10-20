@@ -10,9 +10,11 @@ module Markable
 
         Markable.set_models
 
-        class_eval do
-          class << self
-            attr_accessor :__markable_marks
+        unless respond_to? :__markable_marks
+          class_eval do
+            class << self
+              attr_accessor :__markable_marks
+            end
           end
         end
 
@@ -27,51 +29,54 @@ module Markable
           }
         end
 
-        class_eval do
-          has_many :markable_marks,
-                   :class_name => 'Markable::Mark',
-                   :as => :markable,
-                   :dependent => :delete_all
-          include Markable::ActsAsMarkable::MarkableInstanceMethods
+        unless respond_to? :marked_as
+          class_eval do
+            has_many :markable_marks,
+                     :class_name => 'Markable::Mark',
+                     :as => :markable,
+                     :dependent => :delete_all
+            include Markable::ActsAsMarkable::MarkableInstanceMethods
 
-          def self.marked_as(mark, options = {})
-            by = options[:by]
-            if by.present?
-              result = self.joins(:markable_marks).where({
-                :marks => {
-                  :mark => mark.to_s,
-                  :marker_id => by.id,
-                  :marker_type => by.class.name
-                }
-              })
-              markable = self
-              result.class_eval do
-                define_method :<< do |object|
-                  by.set_mark(mark, object)
-                  self
+            def self.marked_as(mark, options = {})
+              by = options[:by]
+              if by.present?
+                result = self.joins(:markable_marks).where({
+                  :marks => {
+                    :mark => mark.to_s,
+                    :marker_id => by.id,
+                    :marker_type => by.class.name
+                  }
+                })
+                result.class_eval do
+                  define_method :<< do |object|
+                    by.set_mark(mark, object)
+                    self
+                  end
+                  define_method :delete do |markable|
+                    by.remove_mark(mark, markable)
+                    self
+                  end
                 end
-                define_method :delete do |markable|
-                  by.remove_mark(mark, markable)
-                  self
-                end
+              else
+                result = self.joins(:markable_marks).where(:marks => { :mark => mark.to_s }).group("#{self.table_name}.id")
               end
-            else
-              result = self.joins(:markable_marks).where(:marks => { :mark => mark.to_s }).group("#{self.table_name}.id")
+              result
             end
-            result
           end
         end
 
         self.__markable_marks.each do |mark, o|
-          class_eval %(
-            def self.marked_as_#{mark}(options = {})
-              self.marked_as(:#{mark}, options)
-            end
+          unless respond_to? "marked_as_#{mark}"
+            class_eval %(
+              def self.marked_as_#{mark}(options = {})
+                self.marked_as(:#{mark}, options)
+              end
 
-            def marked_as_#{mark}?(options = {})
-              self.marked_as?(:#{mark}, options)
-            end
-          )
+              def marked_as_#{mark}?(options = {})
+                self.marked_as?(:#{mark}, options)
+              end
+            )
+          end
         end
 
         Markable.add_markable(self)
@@ -82,7 +87,7 @@ module Markable
 
       def method_missing(method_sym, *args)
         Markable.models.each do |model_name|
-          if method_sym.to_s =~ Regexp.new("^#{model_name.downcase.pluralize}_have_marked_as(_[\\w_]+)?$")
+          if method_sym.to_s =~ Regexp.new("^#{model_name.downcase.pluralize}_have_marked_as(_[\\w]+)?$")
             model_name.constantize # ping model
 
             if self.methods.include?(method_sym) # method has appear

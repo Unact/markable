@@ -1,6 +1,6 @@
 class MarkableMigration < ActiveRecord::Migration
   def self.up
-    create_table :marks, :id => false do |t|
+    create_table :marks do |t|
       t.references :marker,   :polymorphic => true
       t.references :markable, :polymorphic => true
       t.string     :mark,     :limit => 128
