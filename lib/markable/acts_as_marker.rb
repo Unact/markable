@@ -21,21 +21,6 @@ module Markable
     end
 
     module MarkerInstanceMethods
-      def method_missing(method_sym, *args)
-        Markable.models.each do |model_name|
-          if method_sym.to_s =~ Regexp.new("^[\\w]+_#{model_name.downcase.pluralize}$") ||
-              method_sym.to_s =~ Regexp.new("^#{model_name.downcase.pluralize}_marked_as(_[\\w]+)?$")
-            model_name.constantize # ping model
-            if self.methods.include? method_sym # method has appear
-              return self.method(method_sym).call(*args) # call this method
-            end
-          end
-        end
-        super
-      rescue
-        super
-      end
-
       def set_mark(mark, markables)
         Array.wrap(markables).each do |markable|
           Markable.can_mark_or_raise? self, markable, mark
