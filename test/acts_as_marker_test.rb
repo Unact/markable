@@ -163,6 +163,14 @@ class ActsAsMarkerTest < ActiveSupport::TestCase
     }
   end
 
+  test "acts_as_marker's block works as expected" do
+    sp = get(SuperlativePerson)
+    f = get(Food)
+
+    sp.set_mark :favorite, f
+    assert_equal [f], sp.the_most_favorite_foods
+  end
+
   # Lifecycle
 
   test "marks are deleted when marker is destroyed" do

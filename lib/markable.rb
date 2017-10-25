@@ -9,6 +9,7 @@ module Markable
   @@markers   = []
   @@markables = []
   @@models    = []
+  @@markers_block = {}
   @@marker_objects   = []
   @@markable_objects = []
 
@@ -24,9 +25,10 @@ protected
     create_methods @@marker_objects, [ markable ]
   end
 
-  def self.add_marker(marker)
+  def self.add_marker(marker, &block)
     @@marker_objects.push marker unless @@marker_objects.include? marker
     @@markers.push marker.name.to_sym unless @@markers.include? marker.name.to_sym
+    @@markers_block[marker.name.to_sym] = block if block_given?
     create_methods [ marker ], @@markable_objects
   end
 
@@ -79,6 +81,8 @@ protected
                 end
               )
             end
+
+            @@markers_block[marker.name.to_sym].call(marker, markable, mark) if @@markers_block[marker.name.to_sym].present?
           end
         end
       end

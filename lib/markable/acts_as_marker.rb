@@ -3,7 +3,7 @@ module Markable
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def acts_as_marker(options = {})
+      def acts_as_marker(options = {}, &block)
         Markable.set_models
         class_eval do
           class << self
@@ -16,7 +16,7 @@ module Markable
           has_many :marker_marks, :class_name => 'Markable::Mark', :as => :marker, :dependent => :delete_all
           include Markable::ActsAsMarker::MarkerInstanceMethods
         end
-        Markable.add_marker self
+        Markable.add_marker self, &block
       end
     end
 

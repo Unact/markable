@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20120520101231) do
+ActiveRecord::Schema.define(version: 20171025101231) do
 
   create_table "admins", force: true do |t|
     t.string   "name"
@@ -54,6 +54,12 @@ ActiveRecord::Schema.define(version: 20120520101231) do
 
   add_index "marks", ["markable_id", "markable_type", "mark"], name: "index_marks_on_markable_id_and_markable_type_and_mark"
   add_index "marks", ["marker_id", "marker_type", "mark"], name: "index_marks_on_marker_id_and_marker_type_and_mark"
+
+  create_table "superlative_people", force: true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", force: true do |t|
     t.string   "name"
