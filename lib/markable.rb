@@ -114,4 +114,3 @@ end
 require 'markable/exceptions'
 require 'markable/acts_as_marker'
 require 'markable/acts_as_markable'
-
