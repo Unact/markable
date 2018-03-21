@@ -230,7 +230,7 @@ class ActsAsMarkableTest < ActiveSupport::TestCase
     f1.users_have_marked_as_favorite << [u1, u2, u3]
     f2.users_have_marked_as_favorite << [u1, u2]
     assert_equal Food.marked_as_favorite, [f1, f2]
-    assert_equal Food.marked_as_favorite.count.count, 2
+    assert_equal Food.marked_as_favorite.count, 2
   end
 
   test "ability to call markable_as with few arguments" do

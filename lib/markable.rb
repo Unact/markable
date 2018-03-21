@@ -37,7 +37,7 @@ protected
       markers.try :each do |marker|
         markable.__markable_marks.each do |mark, options|
           if options[:allowed_markers] == :all || options[:allowed_markers].include?(marker.marker_name)
-            markable_name = markable.name.downcase
+            markable_name = markable.markable_name.to_s
 
             unless marker.method_defined? "#{markable_name.pluralize}_marked_as"
               marker.class_eval %(
@@ -105,7 +105,7 @@ protected
     raise Markable::WrongMark.new(marker_object, markable_object, mark) unless markable_object.class.__markable_marks.include?(mark)
 
     raise Markable::NotAllowedMarker.new(marker_object, markable_object, mark) unless (markable_object.class.__markable_marks[mark][:allowed_markers] == :all ||
-                                                                  markable_object.class.__markable_marks[mark][:allowed_markers].include?(marker_name.to_s.downcase.to_sym))
+                                                                  markable_object.class.__markable_marks[mark][:allowed_markers].include?(marker_object.class.marker_name))
 
     true
   end

@@ -10,7 +10,7 @@ module Markable
             attr_accessor :marker_name
           end
         end
-        self.marker_name = self.name.downcase.to_sym
+        self.marker_name = self.name.downcase.gsub("::", "_").to_sym
 
         class_eval do
           has_many :marker_marks, :class_name => 'Markable::Mark', :as => :marker, :dependent => :delete_all

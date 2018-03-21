@@ -14,8 +14,10 @@ module Markable
           class_eval do
             class << self
               attr_accessor :__markable_marks
+              attr_accessor :markable_name
             end
           end
+          self.markable_name = self.name.downcase.gsub("::", "_").to_sym
         end
 
         marks = Array.wrap(marks).map!(&:to_sym)
@@ -58,7 +60,7 @@ module Markable
                   end
                 end
               else
-                result = self.joins(:markable_marks).where(:marks => { :mark => mark.to_s }).group("#{self.table_name}.id")
+                result = self.joins(:markable_marks).where(:marks => { :mark => mark.to_s }).distinct
               end
               result
             end
