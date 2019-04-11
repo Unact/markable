@@ -1,4 +1,4 @@
-class MarkableMigration < ActiveRecord::Migration
+class MarkableMigration < ActiveRecord::Migration[5.0]
   def self.up
     create_table :marks do |t|
       t.references :marker,   :polymorphic => true

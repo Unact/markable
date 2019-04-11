@@ -15,9 +15,7 @@ module Markable
     def self.delete_orphans
       Markable::Mark.all.to_a.delete_if { |mark|
         mark.marker && mark.markable
-      }.each { |orphan|
-        Markable::Mark.delete_all orphan.attributes
-      }.count
+      }.each(&:delete).count
     end
   end
 end
