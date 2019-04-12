@@ -8,8 +8,6 @@ module Markable
         marks   = args.flatten
         by      = options[:by]
 
-        Markable.set_models
-
         unless respond_to? :__markable_marks
           class_eval do
             class << self
@@ -86,6 +84,13 @@ module Markable
     end
 
     module MarkableInstanceMethods
+      def method_missing(method_sym, *args)
+        Markable.set_models
+        super
+      rescue
+        super
+      end
+
       def mark_as(mark, markers)
         Array.wrap(markers).each do |marker|
           Markable.can_mark_or_raise?(marker, self, mark)

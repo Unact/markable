@@ -4,7 +4,6 @@ module Markable
 
     module ClassMethods
       def acts_as_marker(options = {}, &block)
-        Markable.set_models
         class_eval do
           class << self
             attr_accessor :marker_name
@@ -22,6 +21,7 @@ module Markable
 
     module MarkerInstanceMethods
       def method_missing(method_sym, *args)
+        Markable.set_models
         Markable.models.each do |model_name|
           if method_sym.to_s =~ Regexp.new("^[\\w]+_#{model_name.downcase.pluralize}$") ||
               method_sym.to_s =~ Regexp.new("^#{model_name.downcase.pluralize}_marked_as(_[\\w]+)?$")
