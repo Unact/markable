@@ -21,19 +21,19 @@ module Markable
 
     module MarkerInstanceMethods
       def method_missing(method_sym, *args)
-        Markable.set_models
+        super
+      rescue NoMethodError
+        Markable.load_models
         Markable.models.each do |model_name|
           if method_sym.to_s =~ Regexp.new("^[\\w]+_#{model_name.downcase.pluralize}$") ||
-              method_sym.to_s =~ Regexp.new("^#{model_name.downcase.pluralize}_marked_as(_[\\w]+)?$")
-            model_name.constantize # ping model
-            if self.methods.include? method_sym # method has appear
-              return self.method(method_sym).call(*args) # call this method
-            end
+             method_sym.to_s =~ Regexp.new("^#{model_name.downcase.pluralize}_marked_as(_[\\w]+)?$")
+            model_name.constantize
+
+            return self.method(method_sym).call(*args) if self.methods.include?(method_sym)
           end
         end
-        super
-      rescue
-        super
+
+        raise
       end
 
       def set_mark(mark, markables)

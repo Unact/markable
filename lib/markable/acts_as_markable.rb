@@ -84,13 +84,6 @@ module Markable
     end
 
     module MarkableInstanceMethods
-      def method_missing(method_sym, *args)
-        Markable.set_models
-        super
-      rescue
-        super
-      end
-
       def mark_as(mark, markers)
         Array.wrap(markers).each do |marker|
           Markable.can_mark_or_raise?(marker, self, mark)

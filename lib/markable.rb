@@ -8,15 +8,12 @@ module Markable
   mattr_accessor :markers, :markables, :models
   @@markers   = []
   @@markables = []
-  @@models    = []
   @@markers_block = {}
   @@marker_objects   = []
   @@markable_objects = []
 
-protected
-
-  def self.set_models
-    @@models = @@models.presence || ActiveRecord::Base.connection.tables.collect{ |t| t.classify rescue nil }.compact
+  def self.load_models
+    @@models ||= ActiveRecord::Base.connection.tables.collect{ |t| t.classify rescue nil }.compact
   end
 
   def self.add_markable(markable)
