@@ -51,7 +51,5 @@ module Dummy
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
-
-    config.active_record.sqlite3.represent_boolean_as_integer = true
   end
 end
